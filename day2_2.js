@@ -29,9 +29,7 @@ const points = [
 let score = 0
 
 lineReader.on('line', (line) => {
-    const round = line.split(' ')
-    const opponent = round[0]
-    const hand = round[1]
+    const [opponent, hand] = line.split(' ')
     if (opponent === 'A' && hand === 'X') score += points[0][0]
     else if (opponent === 'B' && hand === 'X') score += points[0][1]
     else if (opponent === 'C' && hand === 'X') score += points[0][2]
