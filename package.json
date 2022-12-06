@@ -1,12 +1,23 @@
 {
-  "name": "adventofcode",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "advent-of-code-2022",
+  "version": "0.0.6",
+  "description": "Advent Of Code 2022 Solutions",
+  "main": "day1_1.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "day1_1": "node day1_1.js",
+    "day1_2": "node day1_2.js",
+    "day2_1": "node day2_1.js",
+    "day2_2": "node day2_2.js",
+    "day3_1": "node day3_1.js",
+    "day3_2": "node day3_2.js",
+    "day4_1": "node day4_1.js",
+    "day4_2": "node day4_2.js",
+    "day5_1": "node day5_1.js",
+    "day5_2": "node day5_2.js",
+    "day6_1": "node day6_1.js",
+    "day6_2": "node day6_2.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": ["Advent", "AdventOfCode", "AdventOfCode2022"],
+  "author": "Izan Pérez Cosano",
+  "license": "MIT"
 }
