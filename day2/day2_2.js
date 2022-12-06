@@ -20,6 +20,15 @@ const lineReader = require('readline').createInterface({
 // Y 4 5 6
 // Z 8 9 7
 
+const letter = {
+    'A': 0,
+    'B': 1,
+    'C': 2,
+    'X': 0,
+    'Y': 1,
+    'Z': 2
+}
+
 const points = [
     [3, 1, 2],
     [4, 5, 6],
@@ -30,15 +39,7 @@ let score = 0
 
 lineReader.on('line', (line) => {
     const [opponent, hand] = line.split(' ')
-    if (opponent === 'A' && hand === 'X') score += points[0][0]
-    else if (opponent === 'B' && hand === 'X') score += points[0][1]
-    else if (opponent === 'C' && hand === 'X') score += points[0][2]
-    else if (opponent === 'A' && hand === 'Y') score += points[1][0]
-    else if (opponent === 'B' && hand === 'Y') score += points[1][1]
-    else if (opponent === 'C' && hand === 'Y') score += points[1][2]
-    else if (opponent === 'A' && hand === 'Z') score += points[2][0]
-    else if (opponent === 'B' && hand === 'Z') score += points[2][1]
-    else if (opponent === 'C' && hand === 'Z') score += points[2][2]
+    score += points[letter[hand]][letter[opponent]]
 })
 
 lineReader.on('close', () => {

@@ -20,9 +20,7 @@ lineReader.on('line', (line) => {
 })
 
 lineReader.on('close', () => {
-    calories.sort((a, b) => {
-        return (a > b) ? -1 : 1
-    })
+    calories.sort((a, b) => (a > b) ? -1 : 1)
     console.log('Total:', calories[0] + calories[1] + calories[2])
     // Total: 205381
 })

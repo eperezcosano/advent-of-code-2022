@@ -2,22 +2,25 @@
   "name": "advent-of-code-2022",
   "version": "0.0.6",
   "description": "Advent Of Code 2022 Solutions",
-  "main": "day1_1.js",
   "scripts": {
-    "day1_1": "node day1_1.js",
-    "day1_2": "node day1_2.js",
-    "day2_1": "node day2_1.js",
-    "day2_2": "node day2_2.js",
-    "day3_1": "node day3_1.js",
-    "day3_2": "node day3_2.js",
-    "day4_1": "node day4_1.js",
-    "day4_2": "node day4_2.js",
-    "day5_1": "node day5_1.js",
-    "day5_2": "node day5_2.js",
-    "day6_1": "node day6_1.js",
-    "day6_2": "node day6_2.js"
+    "day1_1": "cd day1 && node day1_1.js",
+    "day1_2": "cd day1 && node day1_2.js",
+    "day2_1": "cd day2 && node day2_1.js",
+    "day2_2": "cd day2 && node day2_2.js",
+    "day3_1": "cd day3 && node day3_1.js",
+    "day3_2": "cd day3 && node day3_2.js",
+    "day4_1": "cd day4 && node day4_1.js",
+    "day4_2": "cd day4 && node day4_2.js",
+    "day5_1": "cd day5 && node day5_1.js",
+    "day5_2": "cd day5 && node day5_2.js",
+    "day6_1": "cd day6 && node day6_1.js",
+    "day6_2": "cd day6 && node day6_2.js"
   },
   "keywords": ["Advent", "AdventOfCode", "AdventOfCode2022"],
   "author": "Izan Pérez Cosano",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eperezcosano/advent-of-code-2022.git"
+  },
   "license": "MIT"
 }
