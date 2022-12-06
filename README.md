@@ -1,6 +1,6 @@
 # Advent Of Code 2022
-These are my solution of this year’s [AdventOfCode](https://adventofcode.com/2022) in nodeJS
-To run it just type `npm run dayN_P`  where **N** is the number of the day and **P** is the part either 1 or 2.
+These are my solutions of this year’s [AdventOfCode](https://adventofcode.com/2022) in nodeJS.
+To run it just type `npm run dayN_P` where **N** is the number of the day and **P** is the part either 1 or 2.
 
 Table of solutions:
 
