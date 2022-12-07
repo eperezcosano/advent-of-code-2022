@@ -14,7 +14,9 @@
     "day5_1": "cd day5 && node day5_1.js",
     "day5_2": "cd day5 && node day5_2.js",
     "day6_1": "cd day6 && node day6_1.js",
-    "day6_2": "cd day6 && node day6_2.js"
+    "day6_2": "cd day6 && node day6_2.js",
+    "day7_1": "cd day7 && node day7_1.js",
+    "day7_2": "cd day7 && node day7_2.js"
   },
   "keywords": ["Advent", "AdventOfCode", "AdventOfCode2022"],
   "author": "Izan Pérez Cosano",
