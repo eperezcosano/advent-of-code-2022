@@ -4,7 +4,7 @@
 *         Advent Of Code 2022
 * */
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test.txt')
+    input: require('fs').createReadStream('./day8_input.txt')
 })
 
 let grid = []
@@ -12,35 +12,46 @@ let res = 0
 
 lineReader.on('line', (line) => grid.push(line))
 
-function visibleFromTop(tree, i , j) {
-    if (i <= 0) return false
-    for (let n = i; n < i; n++) {
-        if (tree > grid[])
+function isOnEdge(i, j) {
+    return j === 0 || j === grid[i].length - 1 || i === 0 || i === grid.length - 1
+}
+
+function isUpTall(i, j) {
+    for (let n = i - 1; n >= 0; n--) {
+        if (grid[n][j] >= grid[i][j]) return false
     }
+    return true
+}
+
+function isDownTall(i, j) {
+    for (let n = i + 1; n <= grid.length - 1; n++) {
+        if (grid[n][j] >= grid[i][j]) return false
+    }
+    return true
+}
+
+function isLeftTall(i, j) {
+    for (let k = j - 1; k >= 0; k--) {
+        if (grid[i][k] >= grid[i][j]) return false
+    }
+    return true
+}
+
+function isRightTall(i, j) {
+    for (let k = j + 1; k <= grid[i].length - 1; k++) {
+        if (grid[i][k] >= grid[i][j]) return false
+    }
+    return true
 }
 
 lineReader.on('close', () => {
-    console.log(grid)
     for (let i = 0; i < grid.length; i++) {
         for (let j = 0; j < grid[i].length; j++) {
-            if (j === 0 || j === grid[i].length - 1 || i === 0 || i === grid.length - 1) {
-                // Edges
-                res++
-            } else if (i > 0 && grid[i][j] > grid[i - 1][j]) {
-                // Up
-                res++
-            } else if (i < grid.length - 1 && grid[i][j] > grid[i + 1][j]) {
-                // Down
-                res++
-            } else if (j > 0 && grid[i][j] > grid[i][j - 1]) {
-                // Left
-                res++
-            } else if (j < grid[i].length - 1 && grid[i][j] > grid[i][j + 1]) {
-                // Right
+            if (isOnEdge(i, j) || isUpTall(i, j) || isDownTall(i, j) || isLeftTall(i, j) || isRightTall(i, j)) {
                 res++
             }
         }
     }
-    console.log(res)
-    // 6832
+    console.log('Total:', res)
+    // Total: 1845
 })
