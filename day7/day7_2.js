@@ -11,13 +11,13 @@ const spaceNeeded = 30000000
 let spaceAvailable = 70000000
 let dirs = []
 let map = new Map()
-let sum = 0
+let res = 0
 
 lineReader.on('line', (line) => {
-    const cmd = line.split(' ')
-    let size = parseInt(cmd[0])
-    if (cmd[1] === 'cd') {
-        cmd[2] === '..' ? dirs.pop() : dirs.push(cmd[2])
+    const [num, command, dir] = line.split(' ')
+    let size = parseInt(num)
+    if (command === 'cd') {
+        dir === '..' ? dirs.pop() : dirs.push(dir)
     } else if (!isNaN(size)) {
         let path = ''
         for (let i = 0; i < dirs.length; i++) {
@@ -31,16 +31,17 @@ lineReader.on('line', (line) => {
     }
 })
 
+
 lineReader.on('close', () => {
     spaceAvailable -= map.get('/')
-    for (const value of map) {
-        const differenceResult = Math.abs(sum - spaceNeeded)
-        const differenceValue = Math.abs((spaceAvailable + value[1]) - spaceNeeded)
-        if (spaceAvailable + value[1] >= spaceNeeded && differenceValue < differenceResult) {
-            sum = value[1]
+    for (const [dir, size] of map) {
+        const differenceResult = Math.abs(res - spaceNeeded)
+        const differenceValue = Math.abs((spaceAvailable + size) - spaceNeeded)
+        if (spaceAvailable + size >= spaceNeeded && differenceValue < differenceResult) {
+            res = size
         }
     }
-    console.log('Total:', sum)
+    console.log('Total:', res)
     // Total: 1117448
 })
 
