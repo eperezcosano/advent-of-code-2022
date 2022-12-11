@@ -1,6 +1,6 @@
 /*
 *   --- Day 10: Cathode-Ray Tube ---
-*         --- Part One ---
+*         --- Part Two ---
 *       Advent Of Code 2022
 * */
 const lineReader = require('readline').createInterface({
