@@ -12,56 +12,53 @@ const rates = {}
 const distances = {}
 
 lineReader.on('line', (line) => {
-    const tokens = line.replace(/,/g, '').split(' ')
-    graph[tokens[1]] = tokens.slice(9)
-    rates[tokens[1]] = parseInt(tokens[4].replace(';', '').split('=')[1])
+    const parts = line.replaceAll(',', '').split(' ')
+    const valve = parts[1]
+    graph[valve] = parts.slice(9)
+    rates[valve] = parseInt(parts[4].slice(5, -1))
 })
 
 function findDistances() {
     Object.keys(graph).forEach(start => {
         Object.keys(graph).forEach(end => {
             if (!distances[start]) distances[start] = {}
-            distances[start][end] = findDistance(graph, start, end).length - 1
+            distances[start][end] = findDistance(graph, start, end)
         })
     })
 }
 
 // Bread-first algorithm
 function findDistance(graph, start, end) {
-    const queue = []
-    const visited = [start]
-
-    if (start === end) return [start]
-    queue.push([start])
-
+    if (start === end) return 0
+    const queue = [[start]]
+    const visited = new Set(start)
     while (queue.length > 0) {
         const path = queue.shift()
-        const valve = path[path.length - 1]
-        for (const neighbor of graph[valve]) {
-            if (visited.includes(neighbor)) continue
-            if (neighbor === end) return [...path, neighbor]
-            visited.push(neighbor)
-            queue.push([...path, neighbor])
+        const node = path[path.length - 1]
+        for (const neighbor of graph[node]) {
+            if (visited.has(neighbor)) continue
+            if (neighbor === end) return path.length
+            visited.add(neighbor)
+            queue.push(path.concat(neighbor))
         }
     }
-
-    return []
+    return 0
 }
 
-function findRates(distances, valve, minutes, left, opened = {}) {
+function findRates(valve, minutes, leftValves, opened = {}) {
     let allRates = [opened]
 
-    left.forEach((other, index) => {
-        let leftMinutes = minutes - distances[valve][other] - 1
+    leftValves.forEach((leftValve, index) => {
+        let leftMinutes = minutes - distances[valve][leftValve] - 1
         if (leftMinutes < 1) return
 
         let newOpened = JSON.parse(JSON.stringify(opened))
-        newOpened[other] = leftMinutes
+        newOpened[leftValve] = leftMinutes
 
-        let newLeft = [...left]
+        let newLeft = [...leftValves]
         newLeft.splice(index, 1)
 
-        allRates.push(...findRates(distances, other, leftMinutes, newLeft, newOpened))
+        allRates.push(...findRates(leftValve, leftMinutes, newLeft, newOpened))
     })
 
     return allRates
@@ -69,10 +66,9 @@ function findRates(distances, valve, minutes, left, opened = {}) {
 
 function part1() {
     findDistances()
-    const filteredValves = Object.keys(graph).filter(valve => rates[valve] !== 0)
-    const res = findRates(distances, 'AA', 30, filteredValves)
-         .map(path => Object.entries(path).reduce((acc, [key, value]) => acc + rates[key] * value, 0))
-         .sort((a,b) => b - a)[0]
+    const res = findRates('AA', 30, Object.keys(graph).filter(valve => rates[valve] > 0))
+          .map(path => Object.entries(path).reduce((acc, [key, value]) => acc + rates[key] * value, 0))
+          .sort((a,b) => b - a)[0]
     console.log('Total:', res)
 }
 
