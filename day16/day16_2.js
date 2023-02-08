@@ -67,7 +67,7 @@ function findRates(distances, valve, minutes, left, opened = {}) {
     return allRates
 }
 
-function part1() {
+function part2() {
     findDistances()
     const filteredValves = Object.keys(graph).filter(valve => rates[valve] !== 0)
     const allRates = findRates(distances, 'AA', 26, filteredValves)
@@ -93,9 +93,7 @@ function part1() {
     })
 
     console.log('Total:', highest)
+    // Total: 2469
 }
 
-lineReader.on('close', () => {
-    findDistances()
-    console.log(distances)
-})
+lineReader.on('close', () => part2())
