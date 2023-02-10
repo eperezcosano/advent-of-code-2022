@@ -4,45 +4,69 @@
 *         Advent Of Code 2022
 * */
 
+const readline = require('readline')
 
-const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test.txt')
-})
+function askQuestion(query) {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
 
-let jetPattern
-lineReader
-    .on('line', (line) => jetPattern = line)
-    .on('close', () => simulation())
+    return new Promise(resolve => rl.question(query, ans => {
+        rl.close();
+        resolve(ans);
+    }))
+}
+
+const debug = true
+
+let jetPattern = '>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>'
 
 let room = []
 
-function simulation() {
-    for (let i = 0, n = 0; i < 10; i++) {
+async function simulation() {
+    for (let i = 0, n = 0; i < 2022; i++) {
         let rock = getRock(i % 5)
         addThreeSpacesUp()
-        console.log(`The #${i + 1} rock begins to falling`)
-        print(rock)
-        print(room)
+        if (debug) {
+            console.log(`The #${i + 1} rock begins to falling`)
+            print(rock)
+            print(room)
+            await askQuestion('Continue')
+            console.log('\033[2J');
+        }
         while (true) {
             const direction = jetPattern[n++ % jetPattern.length]
             if (canMoveToSide(direction, rock)) moveToSide(direction, rock)
-            print(rock)
-            print(room)
-            if (canMoveDown(rock)) {
-                console.log('Rock falls 1 unit')
-                moveDown(rock)
+            if (debug) {
                 print(rock)
                 print(room)
+                await askQuestion('Continue')
+                console.log('\033[2J');
+            }
+            if (canMoveDown(rock)) {
+                if (debug) console.log('Rock falls 1 unit')
+                moveDown(rock)
+                if (debug) {
+                    print(rock)
+                    print(room)
+                    await askQuestion('Continue')
+                    console.log('\033[2J');
+                }
             } else {
-                console.log('Casing it to come to rest')
+                if (debug) console.log('Causing it to come to rest')
                 const restingRock = rock.map(row => row.map(item => item.replace('@', '#')))
-                restingRock.reverse().forEach(row => room.unshift(row))
-                print(room)
+                for (let i = restingRock.length - 1; i >= 0; i--) {
+                    room.unshift(restingRock[i])
+                }
+                if (debug) print(room)
+                await askQuestion('Continue')
+                console.log('\033[2J');
                 break
             }
         }
     }
-
+    console.log(room.length)
 }
 
 function addThreeSpacesUp() {
@@ -109,34 +133,38 @@ function canMoveToSide(direction, rock) {
     if (direction === '<') {
         let res = rock.every(row => {
             const leftEdge = row.indexOf('@')
+            if (leftEdge < 0 && row.indexOf('#') >= 0) return true
             return leftEdge > 0 && row[leftEdge - 1] === '.'
         })
-        if (!res) console.log('Jet of gas pushes rock left, but nothing happens')
+        if (!res && debug) console.log('Jet of gas pushes rock left, but nothing happens')
         return res
     } else {
         let res = rock.every(row => {
             const rightEdge = row.length - row.slice().reverse().indexOf('@') - 1
+            if (row.indexOf('@') < 0 && row.indexOf('#') >= 0) return true
             return rightEdge < (row.length - 1) && row[rightEdge + 1] === '.'
         })
-        if (!res) console.log('Jet of gas pushes rock right, but nothing happens')
+        if (!res && debug) console.log('Jet of gas pushes rock right, but nothing happens')
         return res
     }
 }
 
 function moveToSide(direction, rock) {
     if (direction === '<') {
-        console.log('Jet of gas pushes rock left')
+        if (debug) console.log('Jet of gas pushes rock left')
         return rock.map(row => {
             const leftEdge = row.indexOf('@')
+            if (leftEdge < 0 && row.indexOf('#') >= 0) return row
             const rightEdge = row.length - row.slice().reverse().indexOf('@') - 1
             row[leftEdge - 1] = '@'
             row[rightEdge] = '.'
             return row
         })
     } else {
-        console.log('Jet of gas pushes rock right')
+        if (debug) console.log('Jet of gas pushes rock right')
         return rock.every(row => {
             const leftEdge = row.indexOf('@')
+            if (leftEdge < 0 && row.indexOf('#') >= 0) return row
             const rightEdge = row.length - row.slice().reverse().indexOf('@') - 1
             row[rightEdge + 1] = '@'
             row[leftEdge] = '.'
@@ -146,6 +174,7 @@ function moveToSide(direction, rock) {
 }
 
 function print(element) {
-    element.map(row => row.join('')).forEach(row => console.log(row))
+    element.slice(0, 20).map(row => row.join('')).forEach(row => console.log(row))
 }
 
+simulation()
