@@ -35,13 +35,21 @@
     "day15_2": "cd day15 && node day15_2.js",
     "day16_1": "cd day16 && node day16_1.js",
     "day16_2": "cd day16 && node day16_2.js",
-    "day17_1": "cd day17 && node day17_1.js"
+    "day17_1": "cd day17 && node day17_1.js",
+    "day17_2": "cd day17 && node day17_2.js"
   },
-  "keywords": ["Advent", "AdventOfCode", "AdventOfCode2022"],
+  "keywords": [
+    "Advent",
+    "AdventOfCode",
+    "AdventOfCode2022"
+  ],
   "author": "Izan Pérez Cosano",
   "repository": {
     "type": "git",
     "url": "https://github.com/eperezcosano/advent-of-code-2022.git"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "mathjs": "^11.5.1"
+  }
 }
