@@ -18,14 +18,20 @@ function askQuestion(query) {
     }))
 }
 
-const debug = true
+const debug = false
 
-let jetPattern = '>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>'
+let jetPattern
+const lineReader = readline.createInterface({
+    input: require('fs').createReadStream('./day17.txt')
+})
+
+lineReader.on('line', (line) => jetPattern = line).on('close', () => simulation())
 
 let room = []
+let total = 0
 
 async function simulation() {
-    for (let i = 0, n = 0; i < 2022; i++) {
+    for (let i = 0, n = 0; i < 1000000000000; i++) {
         let rock = getRock(i % 5)
         addThreeSpacesUp()
         if (debug) {
@@ -59,14 +65,32 @@ async function simulation() {
                 for (let i = restingRock.length - 1; i >= 0; i--) {
                     room.unshift(restingRock[i])
                 }
-                if (debug) print(room)
-                await askQuestion('Continue')
-                console.log('\033[2J');
+                checkPrune()
+                if (debug) {
+                    print(room)
+                    await askQuestion('Continue')
+                    console.log('\033[2J');
+                }
                 break
             }
         }
     }
-    console.log(room.length)
+    console.log(room.length + total)
+}
+
+function checkPrune() {
+    let levels = []
+    for (let i = 0; i < 7; i++) {
+        const col = room.map(row => row[i])
+        let topEdge = col.indexOf('#')
+        levels.push(topEdge)
+    }
+    const max = Math.max(...levels)
+    if (!levels.some(level => level === -1)) {
+        total += room.length - max - 1
+        room = room.slice(0, max + 1)
+    }
+
 }
 
 function addThreeSpacesUp() {
@@ -112,7 +136,16 @@ function canMoveDown(rock) {
     if (!room.length) return false
     const bottomRock = rock[rock.length - 1]
     const topRoom = room[0]
-    return !topRoom.some((point, i) => point === '#' && bottomRock[i] === '@')
+    let secondLayer = true
+    if (rock.length > 1) {
+        const midRock = rock[rock.length - 2]
+        secondLayer = !bottomRock.some((point, i) => point === '#' && midRock[i] === '@')
+        if (debug) console.log(midRock.join(''), secondLayer)
+    }
+    const firstLayer = !topRoom.some((point, i) => point === '#' && bottomRock[i] === '@')
+    if (debug) console.log(bottomRock.join(''), firstLayer)
+    if (debug) console.log(topRoom.join(''))
+    return firstLayer && secondLayer
 }
 
 function moveDown(rock) {
@@ -174,7 +207,5 @@ function moveToSide(direction, rock) {
 }
 
 function print(element) {
-    element.slice(0, 20).map(row => row.join('')).forEach(row => console.log(row))
+    element.slice(0, 10).map(row => row.join('')).forEach(row => console.log(row))
 }
-
-simulation()
