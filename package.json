@@ -36,7 +36,8 @@
     "day16_1": "cd day16 && node day16_1.js",
     "day16_2": "cd day16 && node day16_2.js",
     "day17_1": "cd day17 && node day17_1.js",
-    "day17_2": "cd day17 && node day17_2.js"
+    "day17_2": "cd day17 && node day17_2.js",
+    "day17_2_2": "cd day17 && node day17_2_2.js"
   },
   "keywords": [
     "Advent",
