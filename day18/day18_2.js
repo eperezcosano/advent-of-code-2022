@@ -4,123 +4,83 @@
 *         Advent Of Code 2022
 * */
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test.txt')
+    input: require('fs').createReadStream('./day18.txt')
 })
 
-const grid = [
-    // Floor
-    {x: 2, y: 1, z: 2},
-    {x: 3, y: 1, z: 2},
-    {x: 4, y: 1, z: 2},
-    // Ceiling
-    {x: 2, y: 3, z: 2},
-    {x: 3, y: 3, z: 2},
-    {x: 4, y: 3, z: 2},
-    // Back
-    {x: 2, y: 2, z: 3},
-    {x: 3, y: 2, z: 3},
-    {x: 4, y: 2, z: 3},
-    // Front
-    {x: 2, y: 2, z: 1},
-    {x: 3, y: 2, z: 1},
-    {x: 4, y: 2, z: 1},
-    // Left
-    {x: 1, y: 2, z: 2},
-    // Right
-    {x: 5, y: 2, z: 2}
-]
-const N = 20
-
-lineReader.on('line', line => {
-    const [x, y, z] = line.split(',').map(item => parseInt(item))
-    //grid.push({x, y, z})
-}).on('close', () => countSides())
-
-function isAdjacentX(item) {
-    return grid.find(cube => cube.x === item.x + 1 && cube.y === item.y && cube.z === item.z)
-}
-
-function isAdjacentY(item) {
-    return grid.find(cube => cube.x === item.x && cube.y === item.y + 1 && cube.z === item.z)
-}
-
-function isAdjacentZ(item) {
-    return grid.find(cube => cube.x === item.x && cube.y === item.y && cube.z === item.z + 1)
-}
+const cubes = []
 
 function hasCubeLeft(x, y, z) {
-    return grid.find(cube => cube.x === x - 1 && cube.y === y && cube.z === z)
+    return cubes.includes([x - 1, y, z].toString())
 }
 
 function hasCubeRight(x, y, z) {
-    return grid.find(cube => cube.x === x + 1 && cube.y === y && cube.z === z)
+    return cubes.includes([x + 1, y, z].toString())
 }
 
 function hasCubeTop(x, y, z) {
-    return grid.find(cube => cube.x === x && cube.y === y + 1 && cube.z === z)
+    return cubes.includes([x, y + 1, z].toString())
 }
 
 function hasCubeBottom(x, y, z) {
-    return grid.find(cube => cube.x === x && cube.y === y - 1 && cube.z === z)
-}
-
-function hasCubeFront(x, y, z) {
-    return grid.find(cube => cube.x === x && cube.y === y && cube.z === z + 1)
+    return cubes.includes([x, y - 1, z].toString())
 }
 
 function hasCubeBack(x, y, z) {
-    return grid.find(cube => cube.x === x && cube.y === y && cube.z === z - 1)
+    return cubes.includes([x, y, z + 1].toString())
 }
 
-function isAirPocket(x, y, z) {
-    return !!grid.find(cube => cube.x > x && cube.y === y && cube.z === z) &&
-        !!grid.find(cube => cube.x < x && cube.y === y && cube.z === z) &&
-        !!grid.find(cube => cube.x === x && cube.y > y && cube.z === z) &&
-        !!grid.find(cube => cube.x === x && cube.y < y && cube.z === z) &&
-        !!grid.find(cube => cube.x === x && cube.y === y && cube.z > z) &&
-        !!grid.find(cube => cube.x === x && cube.y === y && cube.z < z)
+function hasCubeFront(x, y, z) {
+    return cubes.includes([x, y, z - 1].toString())
 }
 
-function getFaces(cube) {
-    return [
-        {x: cube.x + 1, y: cube.y, z: cube.z},
-        {x: cube.x - 1, y: cube.y, z: cube.z},
-        {x: cube.x, y: cube.y + 1, z: cube.z},
-        {x: cube.x, y: cube.y - 1, z: cube.z},
-        {x: cube.x, y: cube.y, z: cube.z + 1},
-        {x: cube.x, y: cube.y, z: cube.z - 1}
-    ]
+function countSides(x, y, z) {
+    let count = 0
+    if (hasCubeLeft(x, y, z)) count++
+    if (hasCubeRight(x, y, z)) count++
+    if (hasCubeTop(x, y, z)) count++
+    if (hasCubeBottom(x, y, z)) count++
+    if (hasCubeBack(x, y, z)) count++
+    if (hasCubeFront(x, y, z)) count++
+    return count
 }
 
-function sameCubes(cubeA, cubeB) {
-    return cubeA.x === cubeB.x && cubeA.y === cubeB.y && cubeA.z && cubeB.z
-}
-
-function countSides() {
-    let totalSides = grid.length * 6
-    console.log('Total Faces', totalSides)
-    for (const cube of grid) {
-        if (isAdjacentX(cube)) totalSides -= 2
-        if (isAdjacentY(cube)) totalSides -= 2
-        if (isAdjacentZ(cube)) totalSides -= 2
+function getMinAndMax() {
+    let min = Infinity
+    let max = -Infinity
+    for (const cube of cubes) {
+        const [x, y, z] = cube.split(',').map(item => parseInt(item))
+        min = Math.min(min, x, y, z)
+        max = Math.max(max, x, y, z)
     }
-    console.log('Total Sides', totalSides)
-    for (let x = -5; x < N; x++) {
-        for (let y = -5; y < N; y++) {
-            for (let z = -5; z < N; z++) {
-                if (grid.find(cube => cube.x === x && cube.y === y && cube.z === z)) continue
-                if (isAirPocket(x, y, z)) {
-                    console.log('Air Pocket', x, y, z)
-                    if (hasCubeLeft(x, y, z)) totalSides--
-                    if (hasCubeTop(x, y, z)) totalSides--
-                    if (hasCubeBottom(x, y, z)) totalSides--
-                    if (hasCubeRight(x, y, z)) totalSides--
-                    if (hasCubeFront(x, y, z)) totalSides--
-                    if (hasCubeBack(x, y, z)) totalSides--
-                }
-            }
-        }
-    }
-    console.log('Total:', totalSides)
-    // Total:
+    return [min, max]
 }
+
+function isOutbounds(x, y, z, min, max) {
+    return x < min - 1 || y < min - 1 || z < min - 1 || x > max + 1 || y > max + 1 || z > max + 1
+}
+
+function getAdjacentCubes(x, y, z) {
+    return [[x + 1, y, z], [x - 1, y, z], [x, y + 1, z], [x, y - 1, z], [x, y, z + 1], [x, y, z - 1]]
+}
+
+function countVisibleSides() {
+    let sides = 0
+    const visited = []
+    const queue = [[0, 0, 0]]
+    const [min, max] = getMinAndMax()
+    while (queue.length) {
+        const [x, y, z] = queue.shift()
+        const cube = [x, y, z].toString()
+        if (visited.includes(cube) || cubes.includes(cube)) continue
+        if (isOutbounds(x, y, z, min, max)) continue
+        visited.push(cube)
+        sides += countSides(x, y, z)
+        queue.push(...getAdjacentCubes(x, y, z))
+    }
+    console.log('Total:', sides)
+    // Total: 2058
+}
+
+lineReader.on('line', line => {
+    cubes.push(line)
+}).on('close', () => countVisibleSides())
