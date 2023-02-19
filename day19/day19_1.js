@@ -16,7 +16,7 @@ function dfs(blueprint, maxCost, cache, time, robots, minerals) {
     let maxGeodes = minerals.geode + robots.geode * time
 
     for (const [robotType, robotCost] of Object.entries(blueprint)) {
-        if (robotType !== 'geode' && robots[robotType] >= maxCost[robotType]) continue
+        if (robotType !== "geode" && robots[robotType] >= maxCost[robotType]) continue
 
         let maxWait = 0
         let canBuild = true
@@ -30,7 +30,10 @@ function dfs(blueprint, maxCost, cache, time, robots, minerals) {
         }
         if (canBuild) {
             const remainingTime = time - maxWait - 1
-            if (remainingTime <= 0) continue
+            if (remainingTime <= 0) {
+                cache.set(key, maxGeodes)
+                return maxGeodes
+            }
             const tmpRobots = {...robots}
             const tmpMinerals = {... minerals}
             Object.keys(tmpMinerals).forEach((mineralType, mineralAmount) => {
@@ -39,7 +42,7 @@ function dfs(blueprint, maxCost, cache, time, robots, minerals) {
             for (const [mineralType, mineralAmount] of Object.entries(robotCost)) {
                 tmpMinerals[mineralType] -= mineralAmount
             }
-            tmpRobots[robotType]++
+            tmpRobots[robotType] = tmpRobots[robotType] + 1
             for (const mineralType of Object.entries(maxCost)) {
                 tmpMinerals[mineralType] = Math.min(tmpMinerals[mineralType], maxCost[mineralType] * remainingTime)
             }
