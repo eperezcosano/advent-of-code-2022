@@ -4,7 +4,7 @@
 *          Advent Of Code 2022
 * */
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test.txt')
+    input: require('fs').createReadStream('./day19.txt')
 })
 
 let qualityLevel = 0
@@ -28,21 +28,17 @@ function dfs(blueprint, maxCost, cache, time, robots, minerals) {
             const wait = Math.ceil((mineralAmount - minerals[mineralType]) / robots[mineralType])
             maxWait = Math.max(maxWait, wait)
         }
-        if (canBuild) {
-            const remainingTime = time - maxWait - 1
-            if (remainingTime <= 0) {
-                cache.set(key, maxGeodes)
-                return maxGeodes
-            }
+        const remainingTime = time - maxWait - 1
+        if (canBuild && remainingTime > 0) {
             const tmpRobots = {...robots}
-            const tmpMinerals = {... minerals}
-            Object.keys(tmpMinerals).forEach((mineralType, mineralAmount) => {
-                tmpMinerals[mineralType] = mineralAmount + robots[mineralType] * (maxWait + 1)
-            })
-            for (const [mineralType, mineralAmount] of Object.entries(robotCost)) {
-                tmpMinerals[mineralType] -= mineralAmount
+            const tmpMinerals = {...minerals}
+            for (const [mineralType, mineralAmount] of Object.entries(tmpMinerals)) {
+                tmpMinerals[mineralType] = mineralAmount + tmpRobots[mineralType] * (maxWait + 1)
             }
-            tmpRobots[robotType] = tmpRobots[robotType] + 1
+            for (const [mineral, cost] of Object.entries(robotCost)) {
+                tmpMinerals[mineral] -= cost
+            }
+            tmpRobots[robotType]++
             for (const mineralType of Object.entries(maxCost)) {
                 tmpMinerals[mineralType] = Math.min(tmpMinerals[mineralType], maxCost[mineralType] * remainingTime)
             }
@@ -67,6 +63,6 @@ lineReader.on('line', (line) => {
         geode: {ore: geodeCostOre, obsidian: geoCostObsidian}
     }
     const maxGeodes = dfs(blueprint, maxCost, new Map(), 24, {ore: 1, clay: 0, obsidian: 0, geode: 0}, {ore: 0, clay: 0, obsidian: 0, geode: 0})
-    console.log(id, maxGeodes)
     qualityLevel += id * maxGeodes
-}).on('close', () => console.log(qualityLevel))
+}).on('close', () => console.log('Result:', qualityLevel))
+// Result: 1725
