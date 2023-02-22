@@ -14,12 +14,6 @@ const PRIORITY_ORDER = [...TYPES].reverse()
 const lineReader = require('readline').createInterface({
     input: require('fs').createReadStream('./test.txt')
 })
-const { MaxHeap } = require('@datastructures-js/heap')
-let res = new MaxHeap()
-
-lineReader.on('line', (line) => {
-    console.log(harvest(24, 2)(parseBlueprints(line)))
-})
 
 function parseBlueprints(line) {
     const [ , ore, clay, obs_ore, obs_clay, geode_ore, geode_obs, ] = line.split(' ').filter(word => word.match(/\d+/)).map(number => parseInt(number))
@@ -32,7 +26,7 @@ function parseBlueprints(line) {
 }
 
 function hasResourcesFactory(costs) {
-    return function (type, resources, cost = costs[type]) {
+    return function(type, resources, cost = costs[type]) {
         return (resources & MASK_ORE) >= (cost & MASK_ORE)
             && (resources & MASK_CLAY) >= (cost & MASK_CLAY)
             && (resources & MASK_OBS) >= (cost & MASK_OBS)
@@ -40,7 +34,7 @@ function hasResourcesFactory(costs) {
 }
 
 function maxBotsNeededFactory(costs) {
-    return function (type, robots) {
+    return function(type, robots) {
         const maxBotsNeeded = MASKS.map(mask => costs.map(cost => cost & mask).reduce((max, v) => (max > v ? max : v))).reduce((t, v) => t | v, MASK_GEODE)
         return (maxBotsNeeded & MASKS[type]) > (robots & MASKS[type])
     }
@@ -54,32 +48,48 @@ function score(timeLeft, resBots) {
     return (timeLeft * (timeLeft + 1 + 2 * resBots[1])) / 2 + resBots[0]
 }
 
+function maxHeap(array, item) {
+    array.push(item);
+    let index = array.length - 1;
+    let parentIndex = Math.floor((index - 1) / 2);
+    while (index > 0 && array[index][0] > array[parentIndex][0]) {
+        [array[index], array[parentIndex]] = [array[parentIndex], array[index]];
+        index = parentIndex;
+        parentIndex = Math.floor((index - 1) / 2);
+    }
+}
+
 function harvest(minutes, beamFactor) {
     return function (costs) {
-        const needsBot = maxBotsNeededFactory(costs)
-        const hasResources = hasResourcesFactory(costs)
-
-        let pq = [[0, [0, ROBOT[ORE]]]]
+        let queue = [[0, [0, ROBOT[ORE]]]]
         let timeLeft = minutes
         let max = 0
 
         while (timeLeft--) {
-            const nq = []
-            nq.forEach(([, [resources, robots]]) =>
+            const newQueue = []
+            queue.forEach(([, [resources, robots]]) => {
                 PRIORITY_ORDER
-                .filter(type => timeLeftForBot(type, timeLeft) && needsBot(type, robots) && hasResources(type, resources))
-                .map(type => [resources + robots - costs[type], robots + ROBOT[type]])
-                .concat([[resources + robots, robots]])
-                .map(e => (max > e[0] || (max = e[0]), [score(timeLeft, e), e]))
-                .forEach(e => e[0] > max >> 1 && res.push(nq, e))
-            )
-            nq.slice((minutes - timeLeft) << beamFactor)
-            pq = nq
+                    .filter(type => timeLeftForBot(type, timeLeft) && maxBotsNeededFactory(costs)(type, robots) && hasResourcesFactory(costs)(type, resources))
+                    .map(type => [resources + robots - costs[type], robots + ROBOT[type]])
+                    .concat([[resources + robots, robots]])
+                    .map(item => {
+                        if (max <= item[0]) max = item[0]
+                        return [score(timeLeft, item), item]
+                    })
+                    .forEach(item => {
+                        if (item[0] > max >> 1) maxHeap(newQueue, item)
+                    })
+            })
+            newQueue.slice((minutes - timeLeft) << beamFactor)
+            queue = newQueue
         }
         return max >> 18
     }
 }
 
-function qualityLevel(total, id) {
-    return (id + 1) * total
-}
+const res = []
+lineReader.on('line', (line) => {
+    res.push(harvest(32, 7)(parseBlueprints(line)))
+}).on('close', () => {
+    console.log(res)
+})
