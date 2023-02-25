@@ -3,93 +3,87 @@
 *            --- Part Two ---
 *          Advent Of Code 2022
 * */
-const [ORE, CLAY, OBSIDIAN, GEODE] = [0, 1, 2, 3]
-const TYPES = [ORE, CLAY, OBSIDIAN, GEODE]
-const ROBOT = TYPES.map(v => 1 << (v * 6))
-const MASKS = TYPES.map(i => 0x3f << (i * 6))
-const [MASK_ORE, MASK_CLAY, MASK_OBS, MASK_GEODE] = MASKS
-const BOT_TIMES = [15, 6, 3, 1]
-const PRIORITY_ORDER = [...TYPES].reverse()
-
 const lineReader = require('readline').createInterface({
     input: require('fs').createReadStream('./test.txt')
 })
 
-function parseBlueprints(line) {
-    const [ , ore, clay, obs_ore, obs_clay, geode_ore, geode_obs, ] = line.split(' ').filter(word => word.match(/\d+/)).map(number => parseInt(number))
-    return [
-        [ore, 0, 0, 0],
-        [clay, 0, 0, 0],
-        [obs_ore, obs_clay, 0, 0],
-        [geode_ore, 0, geode_obs, 0],
-    ].map(cost => cost.reduce((previousValue, currentValue, currentIndex) => previousValue | (currentValue << (currentIndex * 6))))
-}
+const blueprints = []
 
-function hasResourcesFactory(costs) {
-    return function(type, resources, cost = costs[type]) {
-        return (resources & MASK_ORE) >= (cost & MASK_ORE)
-            && (resources & MASK_CLAY) >= (cost & MASK_CLAY)
-            && (resources & MASK_OBS) >= (cost & MASK_OBS)
-    }
-}
+function maxGeodes(blueprint, maxTime) {
 
-function maxBotsNeededFactory(costs) {
-    return function(type, robots) {
-        const maxBotsNeeded = MASKS.map(mask => costs.map(cost => cost & mask).reduce((max, v) => (max > v ? max : v))).reduce((t, v) => t | v, MASK_GEODE)
-        return (maxBotsNeeded & MASKS[type]) > (robots & MASKS[type])
-    }
-}
+    const maxRobots = [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER];
 
-function timeLeftForBot(type, timeLeft) {
-    return BOT_TIMES[type] <= timeLeft
-}
-
-function score(timeLeft, resBots) {
-    return (timeLeft * (timeLeft + 1 + 2 * resBots[1])) / 2 + resBots[0]
-}
-
-function maxHeap(array, item) {
-    array.push(item);
-    let index = array.length - 1;
-    let parentIndex = Math.floor((index - 1) / 2);
-    while (index > 0 && array[index][0] > array[parentIndex][0]) {
-        [array[index], array[parentIndex]] = [array[parentIndex], array[index]];
-        index = parentIndex;
-        parentIndex = Math.floor((index - 1) / 2);
-    }
-}
-
-function harvest(minutes, beamFactor) {
-    return function (costs) {
-        let queue = [[0, [0, ROBOT[ORE]]]]
-        let timeLeft = minutes
-        let max = 0
-
-        while (timeLeft--) {
-            const newQueue = []
-            queue.forEach(([, [resources, robots]]) => {
-                PRIORITY_ORDER
-                    .filter(type => timeLeftForBot(type, timeLeft) && maxBotsNeededFactory(costs)(type, robots) && hasResourcesFactory(costs)(type, resources))
-                    .map(type => [resources + robots - costs[type], robots + ROBOT[type]])
-                    .concat([[resources + robots, robots]])
-                    .map(item => {
-                        if (max <= item[0]) max = item[0]
-                        return [score(timeLeft, item), item]
-                    })
-                    .forEach(item => {
-                        if (item[0] > max >> 1) maxHeap(newQueue, item)
-                    })
-            })
-            newQueue.slice((minutes - timeLeft) << beamFactor)
-            queue = newQueue
+    for (let i = 0; i < 3; i++) {
+        let maxCost = 0;
+        for (let j = 0; j < blueprint.length; j++) {
+            maxCost = Math.max(maxCost, blueprint[j][i]);
         }
-        return max >> 18
+        maxRobots[i] = maxCost;
     }
+
+    let maxGeodes = 0
+
+    const queue = []
+    queue.push([
+        [0, 0, 0, 0],
+        [1, 0, 0, 0],
+        0
+    ])
+
+    while (queue.length > 0) {
+        const [ inventory, bots, elapsed ] = queue.shift()
+        // for every bot cost, run simulation
+        for (let i = 0; i < blueprint.length; i++) {
+            if (bots[i] >= maxRobots[i]) continue
+            const costs = blueprint[i]
+            // Find the limiting resource type for the costs
+            const waitTime = Math.max(...[0, 1, 2].map(item => {
+                if (costs[item] <= inventory[item]) return 0
+                if (bots[item] === 0) return maxTime + 1
+                return Math.ceil((costs[item] - inventory[item] + bots[item] - 1) / bots[item])
+            }))
+
+            // if that choice would cause the time limit be to exceeded, skip
+            // the + 1 is so the built bot has the chance to do something, it merely being built is not enough
+            const newElapsed = elapsed + waitTime + 1
+            if (newElapsed >= maxTime) continue
+
+            // gather ores with previously available bots
+            const newInventory = [0, 0, 0, 0]
+            for (let j = 0; j < bots.length; j++) {
+                newInventory[j] = inventory[j] + bots[j] * (waitTime + 1) - costs[j]
+            }
+
+            // increase bot type for the bot we just built
+            const newBots = bots.slice()
+            newBots[i]++
+
+            // extra optimization:
+            // if we theoretically only built geode bots every turn, and we still don't beat the maximum, skip
+            const remainingTime = maxTime - newElapsed
+            if (((remainingTime - 1) * remainingTime) / 2 + newInventory[3] + remainingTime * newBots[3] < maxGeodes) continue
+
+            queue.push([newInventory, newBots, newElapsed])
+        }
+
+        const geodes = inventory[3] + bots[3] * (maxTime - elapsed)
+        maxGeodes = Math.max(geodes, maxGeodes)
+    }
+
+    return maxGeodes
 }
 
-const res = []
 lineReader.on('line', (line) => {
-    res.push(harvest(32, 7)(parseBlueprints(line)))
+    const [ , oreCost, clayCost, obsidianCostOre, obsidianCostClay, geodeCostOre, geoCostObsidian] = line.split(' ').filter(word => word.match(/\d+/)).map(number => parseInt(number))
+    blueprints.push([
+        [oreCost, 0, 0, 0],
+        [clayCost, 0, 0, 0],
+        [obsidianCostOre, obsidianCostClay, 0, 0],
+        [geodeCostOre, 0, geoCostObsidian, 0]
+    ])
 }).on('close', () => {
+    const res = blueprints
+        .map((blueprint, id) => (id + 1) * maxGeodes(blueprint, 24))
+        .reduce((acc, val) => acc + val, 0)
     console.log(res)
 })
