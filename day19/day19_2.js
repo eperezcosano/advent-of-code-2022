@@ -4,7 +4,7 @@
 *          Advent Of Code 2022
 * */
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test.txt')
+    input: require('fs').createReadStream('./day19.txt')
 })
 
 const blueprints = []
@@ -40,7 +40,7 @@ function maxGeodes(blueprint, maxTime) {
             const waitTime = Math.max(...[0, 1, 2].map(item => {
                 if (costs[item] <= inventory[item]) return 0
                 if (bots[item] === 0) return maxTime + 1
-                return Math.ceil((costs[item] - inventory[item] + bots[item] - 1) / bots[item])
+                return Math.floor((costs[item] - inventory[item] + bots[item] - 1) / bots[item])
             }))
 
             // if that choice would cause the time limit be to exceeded, skip
@@ -83,7 +83,9 @@ lineReader.on('line', (line) => {
     ])
 }).on('close', () => {
     const res = blueprints
-        .map((blueprint, id) => (id + 1) * maxGeodes(blueprint, 24))
-        .reduce((acc, val) => acc + val, 0)
-    console.log(res)
+        .slice(0, 3)
+        .map(blueprint => maxGeodes(blueprint, 32))
+        .reduce((acc, val) => acc * val, 1)
+    console.log('Result:', res)
+    // Result: 15510
 })
