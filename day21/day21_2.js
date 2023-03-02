@@ -3,7 +3,6 @@
 *               --- Part Two ---
 *             Advent Of Code 2022
 * */
-const {not} = require("mathjs");
 const lineReader = require('readline').createInterface({
     input: require('fs').createReadStream('./day21.txt')
 })
