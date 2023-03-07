@@ -10,7 +10,7 @@ const lineReader = require('readline').createInterface({
 const maze = []
 let movements = []
 let space = false
-let pos = [7, 0]
+let pos = [1, 0]
 let facing = 0
 /*
     Right:  0
@@ -71,19 +71,31 @@ function mod(n, m) {
 function getRow() {
     if (pos[0] > 3 && pos[0] < 8) { // Middle row
         const middleRow = maze[pos[0]]
-        // pos 4 --> col 15
-        // pos 5 --> col 14
-        // pos 6 --> col 13
-        // pos 7 --> col 12
+        // row 4 --> col 15
+        // row 5 --> col 14
+        // row 6 --> col 13
+        // row 7 --> col 12
         const cornerCol = maze.map(row => row[19 - pos[0]])
         return middleRow.concat(cornerCol)
-    } else {                        // Top or bottom row
-        return
+    } else {    // Top or bottom row
+        const topRow = maze[pos[0]].slice(8)
+        // row 0 --> col 4
+        // row 1 --> col 5
+        // row 2 --> col 6
+        // row 3 --> col 7
+        const cornerCol = maze.map(row => row[4 + pos[0]]).slice(4, 8)
+        // row 0 --> 11
+        // row 1 --> 10
+        // row 2 --> 9
+        // row 3 --> 8
+        const bottomRowLeft = maze[11 - pos[0]].slice(8, 12).reverse()
+        const bottomRowRight = maze[11 - pos[0]].slice(12).reverse()
+        return [...bottomRowLeft, ...cornerCol, ...topRow, ...bottomRowRight]
     }
 }
 
 function updatePosRow() {
-    if (pos[0] > 3 && pos[0] < 8 && pos[1] > 11) { // Middle row
+    if (pos[0] > 3 && pos[0] < 8 && pos[1] > 11) { // Middle row and right face
         pos[0] = pos[1] - 4
         pos[1] = 19 - pos[0]
         // y: 4, x: 12 --> y: 8, x: 15
@@ -103,7 +115,31 @@ function updatePosRow() {
         // y: 7, x: 14 --> y: 10, x: 12
         // y: 7, x: 15 --> y: 11, x: 12
     } else {                        // Top or bottom row
-        return
+        if (pos[1] < 4) { // btm left
+            pos[0] -= 11
+            pos[1] -= 11
+            // y: 0, x: 0 --> y: 11, x: 11
+            // y: 0, x: 1 --> y: 11, x: 10
+            // y: 0, x: 2 --> y: 11, x: 9
+            // y: 0, x: 3 --> y: 11, x: 8
+            // y: 1, x: 0 --> y: 10, x: 11
+            // y: 1, x: 1 --> y: 10, x: 10
+            // y: 1, x: 2 --> y: 10, x: 9
+            // y: 1, x: 3 --> y: 10, x: 8
+        } else if (pos[1] > 3 && pos[1] < 8) { // col
+
+        } else if (pos[1] > 11) { //btm right
+            pos[0] -= 11
+            pos[1] = 27 - pos[1]
+            // y: 0, x: 12 --> y: 11, x: 15
+            // y: 0, x: 13 --> y: 11, x: 14
+            // y: 0, x: 14 --> y: 11, x: 13
+            // y: 0, x: 15 --> y: 11, x: 12
+            // y: 1, x: 12 --> y: 10, x: 15
+            // y: 1, x: 13 --> y: 10, x: 14
+            // y: 1, x: 14 --> y: 10, x: 13
+            // y: 1, x: 15 --> y: 10, x: 12
+        }
     }
 }
 
