@@ -10,7 +10,7 @@ const lineReader = require('readline').createInterface({
 const maze = []
 let movements = []
 let space = false
-let pos = [0, 0]
+let pos = [7, 0]
 let facing = 0
 /*
     Right:  0
@@ -25,7 +25,7 @@ lineReader.on('line', line => {
         return
     }
     space ? movements = line.match(/\d+|[LR]/g) : maze.push(line.split(''))
-}).on('close', () => simulation())
+}).on('close', () => getRow())
 
 function simulation() {
     // Starting position at top leftmost
@@ -36,7 +36,6 @@ function simulation() {
         // console.log('current pos', pos)
         if (steps) {
             // Move to the facing direction the number of steps
-            // console.log('Steps', steps)
             switch (facing) {
                 case 0:
                     moveRight(steps)
@@ -53,7 +52,6 @@ function simulation() {
             }
         } else {
             // Turn clockwise (R) or counterclockwise (L)
-            // console.log('Turn', movements[i])
             if (movements[i] === 'R') facing = mod(facing + 1, 4)
             else if (movements[i] === 'L') facing = mod(facing - 1, 4)
         }
@@ -70,26 +68,65 @@ function mod(n, m) {
     return ((n % m) + m) % m
 }
 
-function moveRight(steps) {
-    const row = maze[pos[0]]
-    for (let i = 0; i < steps; i++) {
-        let neighbour = mod(pos[1] + 1, row.length)
-        if (row[neighbour] === ' ') neighbour = row.findIndex(item => item !== ' ')
-        if (row[neighbour] === '#') return
-        pos[1] = neighbour
+function getRow() {
+    if (pos[0] > 3 && pos[0] < 8) { // Middle row
+        const middleRow = maze[pos[0]]
+        // pos 4 --> col 15
+        // pos 5 --> col 14
+        // pos 6 --> col 13
+        // pos 7 --> col 12
+        const cornerCol = maze.map(row => row[19 - pos[0]])
+        return middleRow.concat(cornerCol)
+    } else {                        // Top or bottom row
+        return
     }
 }
 
+function updatePosRow() {
+    if (pos[0] > 3 && pos[0] < 8 && pos[1] > 11) { // Middle row
+        pos[0] = pos[1] - 4
+        pos[1] = 19 - pos[0]
+        // y: 4, x: 12 --> y: 8, x: 15
+        // y: 4, x: 13 --> y: 9, x: 15
+        // y: 4, x: 14 --> y: 10, x: 15
+        // y: 4, x: 15 --> y: 11, x: 15
+        // y: 5, x: 12 --> y: 8, x: 14
+        // y: 5, x: 13 --> y: 9, x: 14
+        // y: 5, x: 14 --> y: 10, x: 14
+        // y: 5, x: 15 --> y: 11, x: 14
+        // y: 6, x: 12 --> y: 8, x: 13
+        // y: 6, x: 13 --> y: 9, x: 13
+        // y: 6, x: 14 --> y: 10, x: 13
+        // y: 6, x: 15 --> y: 11, x: 13
+        // y: 7, x: 12 --> y: 8, x: 12
+        // y: 7, x: 13 --> y: 9, x: 12
+        // y: 7, x: 14 --> y: 10, x: 12
+        // y: 7, x: 15 --> y: 11, x: 12
+    } else {                        // Top or bottom row
+        return
+    }
+}
+
+function moveRight(steps) {
+    const row = getRow()
+    for (let i = 0; i < steps; i++) {
+        const neighbor = mod(pos[1] + 1, row.length)
+        if (row[neighbor] === '#') break
+        pos[1] = neighbor
+    }
+    updatePosRow()
+}
+
 function moveLeft(steps) {
-    const row = maze[pos[0]]
+    const row = getRow()
     // console.log(row)
     for (let i = 0; i < steps; i++) {
-        let neighbour = mod(pos[1] - 1, row.length)
-        if (row[neighbour] === ' ') neighbour = row.length - row.slice().reverse().findIndex(item => item !== ' ') - 1
+        const neighbor = mod(pos[1] - 1, row.length)
         // console.log(i, pos[1], neighbour, row[pos[1]], row[neighbour])
-        if (row[neighbour] === '#') return
-        pos[1] = neighbour
+        if (row[neighbor] === '#') break
+        pos[1] = neighbor
     }
+    updatePosRow()
 }
 
 function moveUp(steps) {
