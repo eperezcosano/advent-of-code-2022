@@ -4,13 +4,13 @@
 *             Advent Of Code 2022
 * */
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test.txt')
+    input: require('fs').createReadStream('./test2.txt')
 })
 
 const maze = []
 let movements = []
 let space = false
-let pos = [1, 0]
+let pos = [0, 8]
 let facing = 0
 /*
     Right:  0
@@ -25,7 +25,14 @@ lineReader.on('line', line => {
         return
     }
     space ? movements = line.match(/\d+|[LR]/g) : maze.push(line.split(''))
-}).on('close', () => getRow())
+}).on('close', () => test())
+
+function test() {
+    pos = [11, 15]
+    for (let i = 0; i < 20; i++) {
+        moveRight(1)
+    }
+}
 
 function simulation() {
     // Starting position at top leftmost
@@ -78,19 +85,49 @@ function getRow() {
         const cornerCol = maze.map(row => row[19 - pos[0]])
         return middleRow.concat(cornerCol)
     } else {    // Top or bottom row
-        const topRow = maze[pos[0]].slice(8)
+        // row 0 -> 0
+        // row 1 -> 1
+        // row 2 -> 2
+        // row 3 -> 3
+
+        // row 8 -> 3
+        // row 9 -> 2
+        // row 10 -> 1
+        // row 11 -> 0
+        const row = (pos[0] < 4) ? pos[0] : 11 - pos[0]
+        const topRow = maze[row].slice(8)
         // row 0 --> col 4
         // row 1 --> col 5
         // row 2 --> col 6
         // row 3 --> col 7
-        const cornerCol = maze.map(row => row[4 + pos[0]]).slice(4, 8)
+
+        // row 8 --> col 7
+        // row 9 --> col 6
+        // row 10 --> col 5
+        // row 11 --> col 4
+        const col = (pos[0] < 4) ? 4 + pos[0] : 15 - pos[0]
+        const cornerCol = maze.map(row => row[col]).slice(4, 8).reverse()
         // row 0 --> 11
         // row 1 --> 10
         // row 2 --> 9
         // row 3 --> 8
-        const bottomRowLeft = maze[11 - pos[0]].slice(8, 12).reverse()
-        const bottomRowRight = maze[11 - pos[0]].slice(12).reverse()
+
+        // row 8 --> 8
+        // row 9 --> 9
+        // row 10 --> 10
+        // row 11 --> 11
+        const btmRow = (pos[0] < 4) ? 11 - pos[0] : pos[0]
+        const bottomRowLeft = maze[btmRow].slice(8, 12).reverse()
+        const bottomRowRight = maze[btmRow].slice(12).reverse()
         return [...bottomRowLeft, ...cornerCol, ...topRow, ...bottomRowRight]
+    }
+}
+
+function getCol() {
+    if (pos[1] < 4 || pos[1] > 7 && pos[1] < 12) {// Left col or mid
+
+    } else { // Mid or
+
     }
 }
 
@@ -116,20 +153,25 @@ function updatePosRow() {
         // y: 7, x: 15 --> y: 11, x: 12
     } else {                        // Top or bottom row
         if (pos[1] < 4) { // btm left
-            pos[0] -= 11
-            pos[1] -= 11
-            // y: 0, x: 0 --> y: 11, x: 11
-            // y: 0, x: 1 --> y: 11, x: 10
-            // y: 0, x: 2 --> y: 11, x: 9
-            // y: 0, x: 3 --> y: 11, x: 8
-            // y: 1, x: 0 --> y: 10, x: 11
-            // y: 1, x: 1 --> y: 10, x: 10
-            // y: 1, x: 2 --> y: 10, x: 9
-            // y: 1, x: 3 --> y: 10, x: 8
+            // pos[0] = 11 - pos[0]
+            pos[1] = 11 - pos[1]
+            // x: 0 --> x: 11
+            // x: 1 --> x: 10
+            // x: 2 --> x: 9
+            // x: 3 --> x: 8
         } else if (pos[1] > 3 && pos[1] < 8) { // col
-
+            pos[0] = pos[1]
+            pos[1] = pos[0] + 4
+            // y: 0, x: 4 --> y: 4, x: 4
+            // y: 0, x: 5 --> y: 5, x: 4
+            // y: 0, x: 6 --> y: 6, x: 4
+            // y: 0, x: 7 --> y: 7, x: 4
+            // y: 1, x: 4 --> y: 4, x: 5
+            // y: 1, x: 5 --> y: 5, x: 5
+            // y: 1, x: 6 --> y: 6, x: 5
+            // y: 1, x: 7 --> y: 7, x: 5
         } else if (pos[1] > 11) { //btm right
-            pos[0] -= 11
+            pos[0] = 11 - pos[0]
             pos[1] = 27 - pos[1]
             // y: 0, x: 12 --> y: 11, x: 15
             // y: 0, x: 13 --> y: 11, x: 14
@@ -143,6 +185,10 @@ function updatePosRow() {
     }
 }
 
+function updatePosCol() {
+
+}
+
 function moveRight(steps) {
     const row = getRow()
     for (let i = 0; i < steps; i++) {
@@ -151,6 +197,7 @@ function moveRight(steps) {
         pos[1] = neighbor
     }
     updatePosRow()
+    console.log(pos, maze[pos[0]][pos[1]])
 }
 
 function moveLeft(steps) {
@@ -166,25 +213,25 @@ function moveLeft(steps) {
 }
 
 function moveUp(steps) {
-    const col = maze.map(row => row[pos[1]])
+    const col = getCol()
     // console.log(col)
     for (let i = 0; i < steps; i++) {
-        let neighbour = mod(pos[0] - 1, col.length)
-        if (col[neighbour] === ' ') neighbour = col.length - col.slice().reverse().findIndex(item => item !== ' ') - 1
+        const neighbor = mod(pos[0] - 1, col.length)
         // console.log(i, pos[0], neighbour, col[pos[0]], col[neighbour])
-        if (col[neighbour] === '#') return
-        pos[0] = neighbour
+        if (col[neighbor] === '#') break
+        pos[0] = neighbor
     }
+    updatePosCol()
 }
 
 function moveDown(steps) {
-    const col = maze.map(row => row[pos[1]])
+    const col = getCol()
     // console.log(col)
     for (let i = 0; i < steps; i++) {
-        let neighbour = mod(pos[0] + 1, col.length)
-        if (col[neighbour] === ' ') neighbour = col.findIndex(item => item !== ' ')
+        const neighbor = mod(pos[0] + 1, col.length)
         // console.log(i, pos[0], neighbour, col[pos[0]], col[neighbour])
-        if (col[neighbour] === '#') return
-        pos[0] = neighbour
+        if (col[neighbor] === '#') break
+        pos[0] = neighbor
     }
+    updatePosCol()
 }
