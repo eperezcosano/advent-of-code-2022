@@ -4,14 +4,14 @@
 *             Advent Of Code 2022
 * */
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./test3.txt')
+    input: require('fs').createReadStream('./day22.txt')
 })
 
-const side = 5
+const side = 50
 const maze = []
 const movements = []
 let space = false
-let pos = [0, side * 2]
+let pos = [0, side]
 let facing = 0
 /*
     Right:  0
@@ -21,9 +21,9 @@ let facing = 0
  */
 
 function test() {
-    pos = [9, 9]
+    pos = [19, 2]
     facing = 0
-    move(1)
+    move(20)
 }
 function mod(n, m) {
     return ((n % m) + m) % m
@@ -48,6 +48,9 @@ function getRow() {
         return [...thirdRow, ...firstRowRev]
     } else if (pos[0] >= (side * 3)) {
         // 4th row
+        const fourthRow = maze[pos[0]].map((item, index) => [item, [pos[0], index], facing])
+        const secondColRev = maze.slice(0, side * 3).map((row, index) => [row[pos[0] - side * 2], [index, pos[0] - side * 2], mod(facing - 1, 4)]).reverse()
+        return [...fourthRow, ...secondColRev]
     }
 }
 
@@ -76,33 +79,34 @@ function move(steps) {
     const direction = (facing < 2) ? 1 : -1
     let neighbor = line.findIndex(item => item[1][0] === pos[0] && item[1][1] === pos[1])
     //console.log(line)
-    console.log(line, neighbor, line[neighbor], line.map(item => item[0]).join(''))
+    // console.log(line, neighbor, line[neighbor], line.map(item => item[0]).join(''))
     for (let i = 0; i < steps; i++) {
         neighbor = mod(neighbor + direction, line.length)
         if (line[neighbor][0] === '#') break
         pos = line[neighbor][1]
         facing = line[neighbor][2]
     }
-    console.log(pos, maze[pos[0]][pos[1]], facing)
+    //console.log(pos, maze[pos[0]][pos[1]], facing)
 }
 
 function simulation() {
     for (let i = 0; i < movements.length; i++) {
         const steps = parseInt(movements[i])
-        // console.log('Current pos', pos, facing, maze[pos[0]][pos[1]])
+        console.log('Current pos', pos, facing, maze[pos[0]][pos[1]])
         if (steps) {
-            // console.log('Move', facing, steps)
+            console.log('Move', facing, steps)
             // Move to the facing direction the number of steps
             move(steps)
         } else {
-            // console.log('Turn', movements[i])
+            console.log('Turn', movements[i])
             // Turn clockwise (R) or counterclockwise (L)
             if (movements[i] === 'R') facing = mod(facing + 1, 4)
             else if (movements[i] === 'L') facing = mod(facing - 1, 4)
         }
     }
-    // console.log(pos, facing)
+    console.log(pos, facing)
     console.log('Result:', (pos[0] + 1) * 1000 + 4 * (pos[1] + 1) + facing)
+    console.log(movements)
 }
 
 lineReader.on('line', line => {
@@ -111,5 +115,5 @@ lineReader.on('line', line => {
         return
     }
     space ? movements.push(...line.match(/\d+|[LR]/g)) : maze.push(line.split(''))
-}).on('close', () => test())
+}).on('close', () => simulation())
 
