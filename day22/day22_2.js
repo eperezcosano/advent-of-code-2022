@@ -21,11 +21,9 @@ let facing = 0
  */
 
 function test() {
-    for (let i = 0; i < 1; i++) {
-        pos = [3, 13]
-        facing = 1
-        move(i)
-    }
+    pos = [14, 2]
+    facing = 0
+    move(1)
 }
 function mod(n, m) {
     return ((n % m) + m) % m
@@ -34,10 +32,17 @@ function mod(n, m) {
 function getRow() {
     if (pos[0] < side) {
         // 1st row
+        const firstRow = maze[pos[0]].slice(side).map((item, index) => [item, [pos[0], index + side], facing])
+        const thirdRowRev = maze[pos[0] + side * 2].map((item, index) => [item, [pos[0] + side * 2, index], mod(facing + 2, 4)]).reverse()
+        return [...firstRow, ...thirdRowRev]
     } else if (pos[0] >= side && pos[0] < (side * 2)) {
         // 2nd row
+
     } else if (pos[0] >= (side * 2) && pos[0] < (side * 3)) {
         // 3rd row
+        const thirdRow = maze[pos[0]].map((item, index) => [item, [pos[0], index], facing])
+        const firstRowRev = maze[pos[0] - side * 2].slice(side).map((item, index) => [item, [pos[0] - side * 2, side + index], mod(facing + 2, 4)]).reverse()
+        return [...thirdRow, ...firstRowRev]
     } else if (pos[0] >= (side * 3)) {
         // 4th row
     }
