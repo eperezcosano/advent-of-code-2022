@@ -31,9 +31,9 @@ lineReader.on('line', line => {
 function test() {
     //console.log('Start', pos, maze[pos[0]][pos[1]])
     for (let i = 0; i < 20; i++) {
-        pos = [11, 8]
-        facing = 2
-        moveLeft(i)
+        pos = [4, 7]
+        facing = 1
+        moveDown(i)
     }
 }
 
@@ -100,9 +100,22 @@ function getRow() {
 }
 
 function getCol() {
-    if (pos[1] < 4 || pos[1] > 7 && pos[1] < 12) {// Left col or mid
+    if (pos[1] < side) {
+        // 1st col
+        const firstCol = maze.slice(side, side * 2).map((row, index) => [row[pos[1]], [pos[0] + index, pos[1]], facing])
+        const thirdCol = maze.map((row, index) => [row[side * 3 - 1 - pos[1]], [index, side * 3 - 1 - pos[1]], mod(facing + 2, 4)]).reverse()
+        return [...firstCol, ...thirdCol]
+    } else if (pos[1] >= side && pos[1] < (side * 2)) {
+        // 2nd col
+        const secondCol = maze.slice(side, side * 2).map((row, index) => [row[pos[1]], [pos[0] + index, pos[1]], facing])
+        const btmRow = maze[side * 4 - 1 - pos[1]].slice(side * 2).map((item, index) => [item, [side * 4 - 1 - pos[1], index + side * 2], mod(facing - 1, 4)])
+        const topRow = maze[pos[1] - side].slice(side * 2).map((item, index) => [item, [pos[1] - side, index + side * 2], mod(facing - 3, 4)]).reverse()
+        return [...secondCol, ...btmRow, ...topRow]
+    } else if (pos[1] >= (side * 2) && pos[1] < (side * 3)) {
+        // 3rd col
 
-    } else { // Mid or
+    } else if (pos[1] >= (side * 3)) {
+        // 4th col
 
     }
 }
@@ -135,24 +148,26 @@ function moveLeft(steps) {
 
 function moveUp(steps) {
     const col = getCol()
-    // console.log(col)
+    let neighbor = col.findIndex(item => item[1][0] === pos[0] && item[1][1] === pos[1])
+    // console.log(col, neighbor, col[neighbor], col.map(item => item[0]).join(''))
     for (let i = 0; i < steps; i++) {
-        const neighbor = mod(pos[0] - 1, col.length)
-        // console.log(i, pos[0], neighbour, col[pos[0]], col[neighbour])
-        if (col[neighbor] === '#') break
-        pos[0] = neighbor
+        neighbor = mod(neighbor - 1, col.length)
+        if (col[neighbor][0] === '#') break
+        pos = col[neighbor][1]
+        facing = col[neighbor][2]
     }
-    updatePosCol()
+    console.log(pos, maze[pos[0]][pos[1]], facing)
 }
 
 function moveDown(steps) {
     const col = getCol()
-    // console.log(col)
+    let neighbor = col.findIndex(item => item[1][0] === pos[0] && item[1][1] === pos[1])
+    //console.log(col, neighbor, col[neighbor], col.map(item => item[0]).join(''))
     for (let i = 0; i < steps; i++) {
-        const neighbor = mod(pos[0] + 1, col.length)
-        // console.log(i, pos[0], neighbour, col[pos[0]], col[neighbour])
-        if (col[neighbor] === '#') break
-        pos[0] = neighbor
+        neighbor = mod(neighbor + 1, col.length)
+        if (col[neighbor][0] === '#') break
+        pos = col[neighbor][1]
+        facing = col[neighbor][2]
     }
-    updatePosCol()
+    console.log(pos, maze[pos[0]][pos[1]], facing)
 }
