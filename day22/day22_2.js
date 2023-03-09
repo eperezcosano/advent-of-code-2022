@@ -31,9 +31,9 @@ lineReader.on('line', line => {
 function test() {
     //console.log('Start', pos, maze[pos[0]][pos[1]])
     for (let i = 0; i < 20; i++) {
-        pos = [4, 7]
-        facing = 1
-        moveDown(i)
+        pos = [0, 11]
+        facing = 3
+        moveUp(i)
     }
 }
 
@@ -113,7 +113,9 @@ function getCol() {
         return [...secondCol, ...btmRow, ...topRow]
     } else if (pos[1] >= (side * 2) && pos[1] < (side * 3)) {
         // 3rd col
-
+        const thirdCol = maze.map((row, index) => [row[pos[1]], [index, pos[1]], facing])
+        const firstCol = maze.slice(side, side * 2).map((row, index) => [row[side * 3 - 1 - pos[1]], [side + index, side * 3 - 1 - pos[1]], mod(facing + 2, 4)]).reverse()
+        return [...thirdCol, ...firstCol]
     } else if (pos[1] >= (side * 3)) {
         // 4th col
 
@@ -162,7 +164,7 @@ function moveUp(steps) {
 function moveDown(steps) {
     const col = getCol()
     let neighbor = col.findIndex(item => item[1][0] === pos[0] && item[1][1] === pos[1])
-    //console.log(col, neighbor, col[neighbor], col.map(item => item[0]).join(''))
+    // console.log(col, neighbor, col[neighbor], col.map(item => item[0]).join(''))
     for (let i = 0; i < steps; i++) {
         neighbor = mod(neighbor + 1, col.length)
         if (col[neighbor][0] === '#') break
