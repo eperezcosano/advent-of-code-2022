@@ -9,9 +9,9 @@ const lineReader = require('readline').createInterface({
 
 const side = 50
 const maze = []
-let movements = []
+const movements = []
 let space = false
-let pos = [0, side * 2]
+let pos = [0, side]
 let facing = 0
 /*
     Right:  0
@@ -36,6 +36,20 @@ function test() {
         moveUp(i)
     }
 }
+function move(steps) {
+    const line = (facing % 2 === 0) ? getRow() : getCol()
+    const direction = (facing < 2) ? 1 : -1
+    let neighbor = line.findIndex(item => item[1][0] === pos[0] && item[1][1] === pos[1])
+    //console.log(line)
+    // console.log(line, neighbor, line[neighbor], line.map(item => item[0]).join(''))
+    for (let i = 0; i < steps; i++) {
+        neighbor = mod(neighbor + direction, line.length)
+        if (line[neighbor][0] === '#') break
+        pos = line[neighbor][1]
+        facing = line[neighbor][2]
+    }
+    //console.log(pos, maze[pos[0]][pos[1]], facing)
+}
 
 function simulation() {
     for (let i = 0; i < movements.length; i++) {
@@ -44,20 +58,7 @@ function simulation() {
         if (steps) {
             // console.log('Move', facing, steps)
             // Move to the facing direction the number of steps
-            switch (facing) {
-                case 0:
-                    moveRight(steps)
-                    break
-                case 1:
-                    moveDown(steps)
-                    break
-                case 2:
-                    moveLeft(steps)
-                    break
-                case 3:
-                    moveUp(steps)
-                    break
-            }
+            move(steps)
         } else {
             // console.log('Turn', movements[i])
             // Turn clockwise (R) or counterclockwise (L)
