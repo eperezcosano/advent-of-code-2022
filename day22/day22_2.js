@@ -40,9 +40,9 @@ function test() {
 function simulation() {
     for (let i = 0; i < movements.length; i++) {
         const steps = parseInt(movements[i])
-        console.log('Current pos', pos, facing, maze[pos[0]][pos[1]])
+        // console.log('Current pos', pos, facing, maze[pos[0]][pos[1]])
         if (steps) {
-            console.log('Move', facing, steps)
+            // console.log('Move', facing, steps)
             // Move to the facing direction the number of steps
             switch (facing) {
                 case 0:
@@ -59,13 +59,12 @@ function simulation() {
                     break
             }
         } else {
-            console.log('Turn', movements[i])
+            // console.log('Turn', movements[i])
             // Turn clockwise (R) or counterclockwise (L)
             if (movements[i] === 'R') facing = mod(facing + 1, 4)
             else if (movements[i] === 'L') facing = mod(facing - 1, 4)
         }
     }
-    console.log(pos, facing)
     console.log(password())
 }
 
@@ -133,7 +132,7 @@ function moveRight(steps) {
         pos = row[neighbor][1]
         facing = row[neighbor][2]
     }
-    console.log(pos, maze[pos[0]][pos[1]], facing)
+    // console.log(pos, maze[pos[0]][pos[1]], facing)
 }
 
 function moveLeft(steps) {
@@ -146,20 +145,20 @@ function moveLeft(steps) {
         pos = row[neighbor][1]
         facing = row[neighbor][2]
     }
-    console.log(pos, maze[pos[0]][pos[1]], facing)
+    // console.log(pos, maze[pos[0]][pos[1]], facing)
 }
 
 function moveUp(steps) {
     const col = getCol()
     let neighbor = col.findIndex(item => item[1][0] === pos[0] && item[1][1] === pos[1])
-    console.log(col, neighbor, col[neighbor], col.map(item => item[0]).join(''))
+    // console.log(col, neighbor, col[neighbor], col.map(item => item[0]).join(''))
     for (let i = 0; i < steps; i++) {
         neighbor = mod(neighbor - 1, col.length)
         if (col[neighbor][0] === '#') break
         pos = col[neighbor][1]
         facing = col[neighbor][2]
     }
-    console.log(pos, maze[pos[0]][pos[1]], facing)
+    // console.log(pos, maze[pos[0]][pos[1]], facing)
 }
 
 function moveDown(steps) {
