@@ -11,8 +11,7 @@ const side = 50
 const maze = []
 let movements = []
 let space = false
-let row = 0
-let col = side
+let [row, col] = [0, side]
 let facing = 0
 /*
     Right:  0
@@ -30,7 +29,7 @@ lineReader.on('line', line => {
 }).on('close', () => simulation())
 
 function password() {
-    return (row + 1) * 1000 + 4 * (col + 1) + facing
+    return (row + 1) * 1000 + (col + 1) * 4 + facing
 }
 
 function mod(n, m) {
@@ -46,6 +45,10 @@ function nextPos() {
     }
 }
 
+function inRange(variable, from) {
+    return (variable >= from && variable < (from + side))
+}
+
 function simulation() {
     for (let i = 0; i < movements.length; i++) {
         const steps = parseInt(movements[i])
@@ -53,58 +56,58 @@ function simulation() {
             for (let j = 0; j < steps; j++) {
                 let prevFacing = facing
                 let [y, x] = nextPos()
-                console.log(x, y, facing)
-                if (facing === 3 && y < 0 && x >= side && x < side * 2) {
+
+                if (facing === 3 && y < 0 && inRange(x, side)) {
                     facing = 0
                     y = x + side * 2
                     x = 0
-                } else if (facing === 2 && x < 0 && y >= side * 3 && y < side * 4) {
+                } else if (facing === 2 && x < 0 && inRange(y, side * 3)) {
                     facing = 1
                     y = 0
                     x = y - side * 2
-                } else if (facing === 3 && y < 0 && x >= side * 2 && x < side * 3) {
+                } else if (facing === 3 && y < 0 && inRange(x, side * 2)) {
                     y = side * 4 - 1
                     x = x - side * 2
-                } else if (facing === 1 && y >= side * 4 && x >= 0 && x < side) {
+                } else if (facing === 1 && y >= side * 4 && inRange(x, 0)) {
                     y = 0
                     x = x + side * 2
-                } else if (facing === 0 && x >= side * 3 && y >= 0 && y < side) {
+                } else if (facing === 0 && x >= side * 3 && inRange(y, 0)) {
                     facing = 2
                     y = side * 3 - 1 - y
                     x = side * 2 - 1
-                } else if (facing === 0 && x >= side * 2 && y >= side * 2 && y < side * 3) {
+                } else if (facing === 0 && x >= side * 2 && inRange(y, side * 2)) {
                     facing = 2
                     y = side * 3 - 1 - y
                     x = side * 3 - 1
-                } else if (facing === 1 && y >= side && x >= side * 3 && x < side * 4) {
+                } else if (facing === 1 && y >= side && inRange(x, side * 3)) {
                     facing = 2
                     y = x - side
                     x = side * 2 - 1
-                } else if (facing === 0 && x >= side * 2 && y >= side && y < side * 2) {
+                } else if (facing === 0 && x >= side * 2 && inRange(y, side)) {
                     facing = 3
                     y = side * 2 - 1
-                    x = y + side * 2
-                } else if (facing === 1 && y >= side * 3 && x >= side && x < side * 2) {
+                    x = y + side
+                } else if (facing === 1 && y >= side * 3 && inRange(x, side)) {
                     facing = 2
                     y = x + side * 2
                     x = side - 1
-                } else if (facing === 0 && x >= side && y >= side * 3 && y < side * 4) {
+                } else if (facing === 0 && x >= side && inRange(y, side * 3)) {
                     facing = 3
                     y = side * 3 - 1
                     x = y - side * 2
-                } else if (facing === 3 && y >= side * 2 && x >= 0 && x < side) {
+                } else if (facing === 3 && y >= side * 2 && inRange(x, 0)) {
                     facing = 0
                     y = x + side
                     x = side
-                } else if (facing === 2 && x < side && y >= side && y < side * 2) {
+                } else if (facing === 2 && x < side && inRange(y, side)) {
                     facing = 1
                     y = side * 2
                     x = y - side
-                } else if (facing === 2 && x < side && y >= 0 && y < side) {
+                } else if (facing === 2 && x < side && inRange(y, 0)) {
                     facing = 0
                     y = side * 3 - 1 - y
                     x = 0
-                } else if (facing === 2 && x < 0 && y >= side * 2 && y < side * 3) {
+                } else if (facing === 2 && x < 0 && inRange(y, side * 2)) {
                     facing = 0
                     y = side * 3 - 1 - y
                     x = side
