@@ -49,7 +49,9 @@
     "day22_1": "cd day22 && node day22_1.js",
     "day22_2": "cd day22 && node day22_2.js",
     "day23_1": "cd day23 && node day23_1.js",
-    "day23_2": "cd day23 && node day23_2.js"
+    "day23_2": "cd day23 && node day23_2.js",
+    "day24_1": "cd day24 && node day24_1.js",
+    "day24_2": "cd day24 && node day24_2.js"
   },
   "keywords": [
     "aoc",
