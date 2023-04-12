@@ -91,50 +91,19 @@ function populateGrid() {
     if (grid[grid.length - 1].some(col => col === '#')) grid.push(new Array(grid[grid.length - 1].length).fill('.'))
 }
 
-function cropGrid() {
-    // Left
-    while (grid.every(row => row[0] === '.')) {
-        grid.forEach(row => row.shift())
-    }
-    // Right
-    while (grid.every(row => row[row.length - 1] === '.')) {
-        grid.forEach(row => row.pop())
-    }
-    // Top
-    while (grid[0].every(col => col === '.')) {
-        grid.shift()
-    }
-    // Bottom
-    while (grid[grid.length - 1].every(col => col === '.')) {
-        grid.pop()
-    }
-}
-
-function countEmptySpaces() {
-    return grid.map(row => row.reduce((sum, item) => item === '.' ? ++sum : sum, 0)).reduce((sum, num) => sum + num, 0)
-}
-
-function printGrid() {
-    grid.forEach(row => console.log(row.join('')))
-}
 function simulation() {
-    for (let round = 1; round <= 10; round++) {
-        console.log('Round', round)
+    for (let round = 1; ; round++) {
         populateGrid()
-        printGrid()
         proposePositions()
-        console.log(nextMoves)
         deleteDuplicates()
-        console.log(nextMoves)
         moveToPositions()
-        printGrid()
         listDirections.push(listDirections.shift())
+        if (!nextMoves.size) {
+            console.log('Rounds:', round)
+            break
+        }
         nextMoves.clear()
     }
-    cropGrid()
-    console.log('----------------------')
-    printGrid()
-    console.log('Result:', countEmptySpaces())
 }
 
 lineReader.on('line', line => {
