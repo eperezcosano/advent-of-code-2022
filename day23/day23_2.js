@@ -100,6 +100,7 @@ function simulation() {
         listDirections.push(listDirections.shift())
         if (!nextMoves.size) {
             console.log('Rounds:', round)
+            // Rounds: 995
             break
         }
         nextMoves.clear()

@@ -125,6 +125,7 @@ function simulation() {
     }
     cropGrid()
     console.log('Result:', countEmptySpaces())
+    // Result: 3849
 }
 
 lineReader.on('line', line => {
