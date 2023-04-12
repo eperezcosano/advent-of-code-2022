@@ -13,12 +13,6 @@ let movements = []
 let space = false
 let [row, col] = [0, side]
 let facing = 0
-/*
-    Right:  0
-    Down:   1
-    Left:   2
-    Up:     3
- */
 
 lineReader.on('line', line => {
     if (!line) {
@@ -46,7 +40,7 @@ function nextPos() {
 }
 
 function inRange(variable, from) {
-    return (variable >= from && variable < (from + side))
+    return variable >= from && variable < (from + side)
 }
 
 function simulation() {
@@ -56,77 +50,61 @@ function simulation() {
             for (let j = 0; j < steps; j++) {
                 let prevFacing = facing
                 let [y, x] = nextPos()
-                console.log('Pre', x, y, facing)
-                if (facing === 3 && y < 0 && inRange(x, side)) {                        // 1
-                    console.log('1')
+                if (facing === 3 && y < 0 && inRange(x, side)) {
                     facing = 0
                     y = x + side * 2
                     x = 0
-                } else if (facing === 2 && x < 0 && inRange(y, side * 3)) {        // 2
-                    console.log('2')
+                } else if (facing === 2 && x < 0 && inRange(y, side * 3)) {
                     facing = 1
                     x = y - side * 2
                     y = 0
-                } else if (facing === 3 && y < 0 && inRange(x, side * 2)) {         // 3
-                    console.log('3')
+                } else if (facing === 3 && y < 0 && inRange(x, side * 2)) {
                     y = side * 4 - 1
                     x = x - side * 2
-                } else if (facing === 1 && y >= side * 4 && inRange(x, 0)) {        // 4
-                    console.log('4')
+                } else if (facing === 1 && y === side * 4 && inRange(x, 0)) {
                     y = 0
                     x = x + side * 2
-                } else if (facing === 0 && x >= side * 3 && inRange(y, 0)) {        // 5
-                    console.log('5')
+                } else if (facing === 0 && x === side * 3 && inRange(y, 0)) {
                     facing = 2
                     y = side * 3 - 1 - y
                     x = side * 2 - 1
-                } else if (facing === 0 && x === side * 2 && inRange(y, side * 2)) { // 6
-                    console.log('6')
+                } else if (facing === 0 && x === side * 2 && inRange(y, side * 2)) {
                     facing = 2
                     y = side * 3 - 1 - y
                     x = side * 3 - 1
-                } else if (facing === 1 && y === side && inRange(x, side * 2)) {     // 7
-                    console.log('7')
+                } else if (facing === 1 && y === side && inRange(x, side * 2)) {
                     facing = 2
                     y = x - side
                     x = side * 2 - 1
-                } else if (facing === 0 && x === side * 2 && inRange(y, side)) {         // 8
-                    console.log('8')
+                } else if (facing === 0 && x === side * 2 && inRange(y, side)) {
                     facing = 3
                     x = y + side
-                    y = side * 2 - 1
-                } else if (facing === 1 && y === side * 3 && inRange(x, side)) {         // 9
-                    console.log('9')
+                    y = side - 1
+                } else if (facing === 1 && y === side * 3 && inRange(x, side)) {
                     facing = 2
                     y = x + side * 2
                     x = side - 1
-                } else if (facing === 0 && x === side && inRange(y, side * 3)) {    // 10
-                    console.log('10')
+                } else if (facing === 0 && x === side && inRange(y, side * 3)) {
                     facing = 3
                     x = y - side * 2
                     y = side * 3 - 1
-                } else if (facing === 3 && y === side * 2 - 1 && inRange(x, 0)) {        // 11
-                    console.log('11')
+                } else if (facing === 3 && y === side * 2 - 1 && inRange(x, 0)) {
                     facing = 0
                     y = x + side
                     x = side
-                } else if (facing === 2 && x === side - 1 && inRange(y, side)) {              // 12
-                    console.log('12')
+                } else if (facing === 2 && x === side - 1 && inRange(y, side)) {
                     facing = 1
                     x = y - side
                     y = side * 2
-                } else if (facing === 2 && x === side - 1 && inRange(y, 0)) {            // 13
-                    console.log('13')
+                } else if (facing === 2 && x === side - 1 && inRange(y, 0)) {
                     facing = 0
                     y = side * 3 - 1 - y
                     x = 0
                 } else if (facing === 2 && x < 0 && inRange(y, side * 2)) {
-                    console.log('14')
                     facing = 0
                     y = side * 3 - 1 - y
                     x = side
                 }
-                console.log('Post', x, y, facing)
                 if (maze[y][x] === '#') {
                     facing = prevFacing
                     break
@@ -139,5 +117,6 @@ function simulation() {
             else if (movements[i] === 'L') facing = mod(facing - 1, 4)
         }
     }
-    console.log(password())
+    console.log('Password:', password())
+    // Password: 15410
 }
