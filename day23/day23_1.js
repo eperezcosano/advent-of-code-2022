@@ -5,7 +5,7 @@
 * */
 const {row} = require("mathjs");
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./small.txt')
+    input: require('fs').createReadStream('./sample.txt')
 })
 
 const grid = []
@@ -16,6 +16,16 @@ const listDirections = [
     { dy: 0, dx: 1 },
     { dy: 0, dx: -1 },
 ]
+
+function hasNeighbors(y, x) {
+    for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) {
+            if (dy === 0 && dx === 0) continue
+            if (grid[y + dy][x + dx] === '#') return true
+        }
+    }
+    return false
+}
 
 function hasAdjacentPosition(y, x, dy, dx) {
     if (dy !== 0) {
@@ -31,6 +41,7 @@ function hasAdjacentPosition(y, x, dy, dx) {
 }
 
 function proposePosition(y, x) {
+    if (!hasNeighbors(y, x)) return
     for (const {dy, dx} of listDirections) {
         if (!hasAdjacentPosition(y, x, dy, dx)) {
             nextMoves.set(`${y}-${x}`, `${y + dy}-${x + dx}`)
@@ -71,24 +82,59 @@ function moveToPositions() {
 }
 
 function populateGrid() {
+    // Left
     if (grid.some(row => row[0] === '#')) grid.forEach(row => row.unshift('.'))
+    // Right
     if (grid.some(row => row[row.length - 1] === '#')) grid.forEach(row => row.push('.'))
+    // Top
     if (grid[0].some(col => col === '#')) grid.unshift(new Array(grid[0].length).fill('.'))
+    // Bottom
     if (grid[grid.length - 1].some(col => col === '#')) grid.push(new Array(grid[grid.length - 1].length).fill('.'))
 }
+
+function cropGrid() {
+    // Left
+    while (grid.every(row => row[0] === '.')) {
+        grid.forEach(row => row.shift())
+    }
+    // Right
+    while (grid.every(row => row[row.length - 1] === '.')) {
+        grid.forEach(row => row.pop())
+    }
+    // Top
+    while (grid[0].every(col => col === '.')) {
+        grid.shift()
+    }
+    // Bottom
+    while (grid[grid.length - 1].every(col => col === '.')) {
+        grid.pop()
+    }
+}
+
+function countEmptySpaces() {
+    return grid.map(row => row.reduce((sum, item) => item === '.' ? ++sum : sum, 0)).reduce((sum, num) => sum + num, 0)
+}
+
+function printGrid() {
+    grid.forEach(row => console.log(row.join('')))
+}
 function simulation() {
-    for (let round = 1; round <= 4; round++) {
+    for (let round = 1; round <= 10; round++) {
         console.log('Round', round)
         populateGrid()
-        console.log(grid)
+        printGrid()
         proposePositions()
         console.log(nextMoves)
         deleteDuplicates()
         console.log(nextMoves)
         moveToPositions()
-        console.log(grid)
+        printGrid()
         listDirections.push(listDirections.shift())
+        nextMoves.clear()
     }
+    cropGrid()
+    printGrid()
+    console.log('Result:', countEmptySpaces())
 }
 
 lineReader.on('line', line => {
