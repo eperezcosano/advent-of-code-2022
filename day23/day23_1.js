@@ -3,9 +3,8 @@
 *               --- Part One ---
 *             Advent Of Code 2022
 * */
-const {row} = require("mathjs");
 const lineReader = require('readline').createInterface({
-    input: require('fs').createReadStream('./sample.txt')
+    input: require('fs').createReadStream('./day23.txt')
 })
 
 const grid = []
@@ -13,8 +12,8 @@ const nextMoves = new Map()
 const listDirections = [
     { dy: -1, dx: 0 },
     { dy: 1, dx: 0 },
-    { dy: 0, dx: 1 },
     { dy: 0, dx: -1 },
+    { dy: 0, dx: 1 },
 ]
 
 function hasNeighbors(y, x) {
@@ -115,25 +114,16 @@ function countEmptySpaces() {
     return grid.map(row => row.reduce((sum, item) => item === '.' ? ++sum : sum, 0)).reduce((sum, num) => sum + num, 0)
 }
 
-function printGrid() {
-    grid.forEach(row => console.log(row.join('')))
-}
 function simulation() {
     for (let round = 1; round <= 10; round++) {
-        console.log('Round', round)
         populateGrid()
-        printGrid()
         proposePositions()
-        console.log(nextMoves)
         deleteDuplicates()
-        console.log(nextMoves)
         moveToPositions()
-        printGrid()
         listDirections.push(listDirections.shift())
         nextMoves.clear()
     }
     cropGrid()
-    printGrid()
     console.log('Result:', countEmptySpaces())
 }
 
