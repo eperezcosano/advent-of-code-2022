@@ -8,8 +8,6 @@ const lineReader = require('readline').createInterface({
     input: require('fs').createReadStream('./sample.txt')
 })
 
-let [maxY, maxX] = [0, 0]
-let repetition = 0
 const grid = []
 const blizzards = Array.from({ length: 4 }, () => new Set())
 
@@ -17,11 +15,14 @@ function mod(n, m) {
     return ((n % m) + m) % m
 }
 
-
 function bfs() {
+    const maxY = grid.length - 1
+    const maxX = grid[0].length - 1
+    const repetition = lcm(maxY, maxX)
+    console.log(maxY, maxX, repetition)
     const queue = []
     const seen = new Set()
-    queue.push([0, 0, 1])
+    queue.push([0, -1, 0])
     while (queue.length) {
         let [time, y, x] = queue.shift()
         time++
@@ -30,11 +31,10 @@ function bfs() {
 
             if (nextY === maxY && nextX === maxX - 1) return time
 
-            if ((nextY < 1 || nextX < 1 || nextY > maxY || nextX > maxX) && (nextY !== 0 && nextX !== 1))
-                continue
+            if ((nextY < 1 || nextX < 1 || nextY > maxY || nextX > maxX) && (nextY !== 0 && nextX !== 1)) continue
 
             let canMove = true
-            if (nextY !== 0 && nextX !== 1) {
+            if (nextY !== -1 && nextX !== 0) {
                 for (const [direction, [testY, testX]] of [[0, -1], [0, 1], [-1, 0], [1, 0]].entries()) {
                     const state = [mod(nextY - testY * time, maxY), mod(nextX - testX * time, maxX)]
                     if (blizzards[direction].has(state.join('-'))) {
@@ -50,7 +50,6 @@ function bfs() {
                 queue.push([time, nextY, nextX])
             }
         }
-
     }
 }
 
@@ -64,7 +63,7 @@ function getBlizzardDirection(char) {
 
 function mapBlizzard(y, x) {
     const direction = getBlizzardDirection(grid[y][x])
-    blizzards[direction].add(`${y - 1}-${x - 1}`)
+    blizzards[direction].add(`${y}-${x}`)
 }
 
 function mapBlizzards() {
@@ -79,10 +78,14 @@ function printGrid() {
     grid.forEach(row => console.log(row.join('')))
 }
 
+function cropGrid() {
+    grid.shift()
+    grid.forEach(row => row.shift())
+}
 
 function simulation() {
-    [maxY, maxX] = [grid.length - 1, grid[grid.length - 1].length - 1]
-    repetition = lcm(maxY, maxX)
+    cropGrid()
+    mapBlizzards()
     console.log(bfs())
 }
 
