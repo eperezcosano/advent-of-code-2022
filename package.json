@@ -1,6 +1,6 @@
 {
   "name": "advent-of-code-2022",
-  "version": "0.0.24",
+  "version": "0.0.25",
   "description": "Advent Of Code 2022 Solutions",
   "scripts": {
     "day1_1": "cd day1 && node day1_1.js",
@@ -51,7 +51,9 @@
     "day23_1": "cd day23 && node day23_1.js",
     "day23_2": "cd day23 && node day23_2.js",
     "day24_1": "cd day24 && node day24_1.js",
-    "day24_2": "cd day24 && node day24_2.js"
+    "day24_2": "cd day24 && node day24_2.js",
+    "day25_1": "cd day25 && node day25_1.js",
+    "day25_2": "cd day25 && node day25_2.js"
   },
   "keywords": [
     "aoc",
