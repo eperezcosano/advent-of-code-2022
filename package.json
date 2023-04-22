@@ -1,6 +1,6 @@
 {
   "name": "advent-of-code-2022",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Advent Of Code 2022 Solutions",
   "scripts": {
     "day1_1": "cd day1 && node day1_1.js",
