@@ -69,6 +69,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "mathjs": "^11.5.1"
+    "mathjs": "^15.2.0"
   }
 }
